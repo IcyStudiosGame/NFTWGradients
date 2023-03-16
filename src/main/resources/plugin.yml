@@ -1,0 +1,5 @@
+name: NFTWGradients
+version: 0.0.1
+author: IcyStudiosGame
+
+main: com.nftworlds.gradients.NFTWGradientsPlugin
