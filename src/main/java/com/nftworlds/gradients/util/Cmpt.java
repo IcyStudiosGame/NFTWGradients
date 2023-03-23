@@ -122,7 +122,7 @@ public final class Cmpt {
                 int toColor = colors.get(toIndex);
                 int color = interpolate(fromColor, toColor, progress);
 
-                builder.append(color(toHex(color)));
+                builder.append(color(IntColor.toHex(color)));
 
                 colorIndex++;
             }
@@ -151,10 +151,6 @@ public final class Cmpt {
         }
 
         return builder.toString();
-    }
-
-    public static String toHex(int color) {
-        return "#" + String.format("%08x", color).substring(2);
     }
 
     private static String color(String hex) {
@@ -255,19 +251,19 @@ public final class Cmpt {
     }
 
     private static int interpolate(int fromColor, int toColor, float progress) {
-        int fromR = (fromColor >> 16) & 0xFF;
-        int fromG = (fromColor >> 8) & 0xFF;
-        int fromB = fromColor & 0xFF;
+        int fromR = IntColor.getRed(fromColor);
+        int fromG = IntColor.getGreen(fromColor);
+        int fromB = IntColor.getBlue(fromColor);
 
-        int toR = (toColor >> 16) & 0xFF;
-        int toG = (toColor >> 8) & 0xFF;
-        int toB = toColor & 0xFF;
+        int toR = IntColor.getRed(toColor);
+        int toG = IntColor.getGreen(toColor);
+        int toB = IntColor.getBlue(toColor);
 
-        int r = Math.round(fromR + progress * (toR - fromR)) & 0xFF;
-        int g = Math.round(fromG + progress * (toG - fromG)) & 0xFF;
-        int b = Math.round(fromB + progress * (toB - fromB)) & 0xFF;
+        int r = Math.round(fromR + progress * (toR - fromR));
+        int g = Math.round(fromG + progress * (toG - fromG));
+        int b = Math.round(fromB + progress * (toB - fromB));
 
-        return r << 16 | g << 8 | b;
+        return IntColor.fromRGB(r, g, b);
     }
 
     private static int getTextLength(String text) {

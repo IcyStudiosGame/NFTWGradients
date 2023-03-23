@@ -7,6 +7,7 @@ import com.nftworlds.gradients.hook.GradientNameExpansion;
 import com.nftworlds.gradients.listener.PlayerListener;
 import com.nftworlds.gradients.menu.GradientMenuListener;
 import com.nftworlds.gradients.sql.GradientMySQL;
+import com.nftworlds.gradients.util.IntColor;
 import org.bukkit.Server;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.Configuration;
@@ -22,13 +23,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class NFTWGradientsPlugin extends JavaPlugin {
 
     private GradientMySQL mySQL;
 
-    private final Map<Player, GradientPlayer> players = new HashMap<>();
+    // Here ConcurrentHashMap, because the information
+    // from this collection is used by the PlaceholderAPI
+    // or can be useful in asynchronous chat events.
+    private final Map<Player, GradientPlayer> players = new ConcurrentHashMap<>();
     private final Cache<String, GradientPlayer> cachedPlayers = CacheBuilder.newBuilder()
             .expireAfterWrite(3L, TimeUnit.MINUTES)
             .build();
@@ -135,20 +140,24 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         }
 
         Configuration configuration = YamlConfiguration.loadConfiguration(file);
+        // TODO: sql
+
         ConfigurationSection section = configuration.getConfigurationSection("Gradients");
-        for (String key : section.getKeys(false)) {
+        if (section != null) {
+            for (String key : section.getKeys(false)) {
 
-            String name = section.getString(key + ".Name");
-            List<String> lore = section.getStringList(key + ".Description");
-            String permission = "nftgradients." + key;
+                String name = section.getString(key + ".Name");
+                List<String> lore = section.getStringList(key + ".Description");
+                String permission = "nftgradients." + key;
 
-            List<String> colors = section.getStringList(key + ".Colors");
-            List<Integer> intColors = new ArrayList<>();
-            for (String color : colors) {
-                intColors.add(Integer.parseInt(color.substring(1), 16));
+                List<String> colors = section.getStringList(key + ".Colors");
+                List<Integer> intColors = new ArrayList<>();
+                for (String color : colors) {
+                    intColors.add(IntColor.fromHex(color));
+                }
+
+                gradients.put(key, new Gradient(key, name, lore, permission, intColors));
             }
-
-            gradients.put(key, new Gradient(key, name, lore, permission, intColors));
         }
     }
 

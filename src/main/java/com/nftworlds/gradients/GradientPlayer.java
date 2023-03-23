@@ -1,7 +1,5 @@
 package com.nftworlds.gradients;
 
-import com.nftworlds.gradients.util.Cmpt;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public class GradientPlayer {
@@ -25,10 +23,6 @@ public class GradientPlayer {
 
     public void setHandle(Player handle) {
         this.handle = handle;
-
-        if (this.gradient != null) {
-            applyGradient(this.handle, this.gradient);
-        }
     }
 
     public Gradient getGradient() {
@@ -37,20 +31,23 @@ public class GradientPlayer {
 
     public void setGradient(Gradient gradient) {
         this.gradient = gradient;
-
-        if (this.handle != null) {
-            applyGradient(this.handle, this.gradient);
-        }
     }
 
-    private static void applyGradient(Player handle, Gradient gradient) {
-        Component displayName = null;
-        if (gradient != null) {
-            displayName = Cmpt.gradient(handle.getName(), gradient.getColors());
+    public boolean hasAccess(Gradient gradient) {
+        if (handle == null) {
+            return false;
         }
 
-        handle.displayName(displayName);
-        handle.playerListName(displayName);
+        if (gradient == null) {
+            return true;
+        }
+
+        String permission = gradient.getPermission();
+        if (permission == null || permission.isEmpty()) {
+            return true;
+        }
+
+        return handle.hasPermission(permission);
     }
 
 }
