@@ -1,6 +1,7 @@
 package com.nftworlds.gradients.menu;
 
 import com.nftworlds.gradients.Gradient;
+import com.nftworlds.gradients.GradientPlayer;
 import com.nftworlds.gradients.NFTWGradientsPlugin;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.HumanEntity;
@@ -15,6 +16,9 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,9 +34,14 @@ public class GradientMenuListener implements Listener {
     @EventHandler
     public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
         if (event.getMessage().equalsIgnoreCase("/menu")) {
+            GradientPlayer player = plugin.getPlayer(event.getPlayer());
+
             GradientPageMenu menu = new GradientPageMenu(plugin, event.getPlayer());
 
-            for (Gradient gradient : plugin.getGradients()) {
+            List<Gradient> gradients = new ArrayList<>(plugin.getGradients());
+            gradients.sort(Comparator.comparingInt(value -> value.getTest(player)));
+
+            for (Gradient gradient : gradients) {
                 menu.addGradient(gradient);
             }
 

@@ -77,22 +77,14 @@ public class GradientPageMenu implements GradientMenu {
 
     @Override
     public void onClick(Player handle, int slot) {
-        GradientPlayer player = plugin.getPlayer(handle);
-        if (player == null) {
-            return;
-        }
-
         Action action = actions.get(slot);
-        if (action == null) {
-            return;
+        if (action != null) {
+            action.apply(handle);
         }
-
-        action.apply(handle);
     }
 
     @Override
     public void onClose(Player handle) {
-
     }
 
     private boolean nextSlot() {
@@ -164,7 +156,14 @@ public class GradientPageMenu implements GradientMenu {
 
         @Override
         public void apply(Player handle) {
-            handle.sendMessage(Cmpt.gradient(handle.getName(), gradient.getColors()));
+            GradientPlayer player = plugin.getPlayer(handle);
+            if (player != null) {
+                player.setGradient(gradient);
+            }
+
+            Component displayName = Cmpt.gradient(handle.getName(), gradient.getColors());
+            handle.displayName(displayName);
+            handle.playerListName(displayName);
         }
 
     }

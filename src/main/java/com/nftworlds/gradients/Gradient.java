@@ -33,4 +33,16 @@ public class Gradient {
         return permission;
     }
 
+    public int getTest(GradientPlayer player) {
+        if (equals(player.getGradient())) {
+            return -1;
+        }
+
+        if (player.getHandle().hasPermission(permission)) {
+            return 0;
+        }
+
+        return 1;
+    }
+
 }
