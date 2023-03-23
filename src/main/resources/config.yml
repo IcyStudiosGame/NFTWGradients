@@ -6,24 +6,22 @@ Gradients:
       - '<text color="#A5ACB8">in its ability to reveal hidden beauty</text>'
       - '<text color="#A5ACB8">and joy even in the darkest and</text>'
       - '<text color="#A5ACB8">gloomiest environments.</text>'
-    Item:
-      Type: 'AIR'
-      Skull: ''
-      ModelData: 20
     Colors:
       - '#E8CBC0'
       - '#636FA4'
   ViceCity:
     Name: 'Vice City'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#3494E6'
       - '#EC6EAD'
   Radar:
     Name: 'Radar'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#A770EF'
       - '#CF8BF3'
@@ -31,21 +29,24 @@ Gradients:
   CosmicFusion:
     Name: 'Cosmic Fusion'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#FF00CC'
       - '#333399'
   Nepal:
     Name: 'Nepal'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#DE6161'
       - '#2657EB'
   Superman:
     Name: 'Superman'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#0099F7'
       - '#F11712'
@@ -61,14 +62,16 @@ Gradients:
   Timber:
     Name: 'Timber'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#FC00FF'
       - '#00DBDE'
   Instagram:
     Name: 'Instagram'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#833AB4'
       - '#FD1D1D'
@@ -76,7 +79,8 @@ Gradients:
   MysticalAtlas:
     Name: 'Mystical Atlas'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#FEAC5E'
       - '#C779D0'
@@ -84,7 +88,8 @@ Gradients:
   Nelson:
     Name: 'Nelson'
     Description:
-      - ''
+      - '<text color="#A5ACB8">Test description of the gradient,</text>'
+      - '<text color="#A5ACB8">any text can be here.</text>'
     Colors:
       - '#F2709C'
       - '#FF9472'
