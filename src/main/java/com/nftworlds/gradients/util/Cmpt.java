@@ -3,6 +3,7 @@ package com.nftworlds.gradients.util;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,6 +70,105 @@ public final class Cmpt {
         component = component.append(Component.text(input.substring(lastIndex)));
 
         return component;
+    }
+
+    public static String gradientTest(String text, List<Integer> colors) {
+        StringBuilder builder = new StringBuilder();
+
+        int textLength = getTextLength(text);
+        int colorCount = colors.size();
+        float step = (colorCount - 1F) / (textLength - 1F);
+
+        int colorIndex = 0;
+
+        boolean bold = false;
+        boolean italic = false;
+        boolean underlined = false;
+        boolean strikethrough = false;
+        boolean obfuscated = false;
+
+        for (int index = 0; index < text.length(); index++) {
+            char symbol = text.charAt(index);
+
+            if (symbol == COLOR_CHAR) {
+                int nextIndex = index + 1;
+                if (nextIndex < text.length()) {
+                    char test = text.charAt(nextIndex);
+                    switch (test) {
+                        case 'l', 'L' -> bold = true;
+                        case 'o', 'O' -> italic = true;
+                        case 'n', 'N' -> underlined = true;
+                        case 'm', 'M' -> strikethrough = true;
+                        case 'k', 'K' -> obfuscated = true;
+                        default -> {
+                            bold = false;
+                            italic = false;
+                            underlined = false;
+                            strikethrough = false;
+                            obfuscated = false;
+                        }
+                    }
+                }
+                index = nextIndex;
+                continue;
+            }
+
+            if (symbol != ' ') {
+                int fromIndex = (int) Math.floor(step * colorIndex);
+                int toIndex = Math.min(fromIndex + 1, colorCount - 1);
+                float progress = step * colorIndex - fromIndex;
+
+                int fromColor = colors.get(fromIndex);
+                int toColor = colors.get(toIndex);
+                int color = interpolate(fromColor, toColor, progress);
+
+                builder.append(color(toHex(color)));
+
+                colorIndex++;
+            }
+
+            if (bold) {
+                builder.append(ChatColor.BOLD);
+            }
+
+            if (italic) {
+                builder.append(ChatColor.ITALIC);
+            }
+
+            if (underlined) {
+                builder.append(ChatColor.UNDERLINE);
+            }
+
+            if (strikethrough) {
+                builder.append(ChatColor.STRIKETHROUGH);
+            }
+
+            if (obfuscated) {
+                builder.append(ChatColor.MAGIC);
+            }
+
+            builder.append(symbol);
+        }
+
+        return builder.toString();
+    }
+
+    public static String toHex(int color) {
+        return "#" + String.format("%08x", color).substring(2);
+    }
+
+    private static String color(String hex) {
+        if (hex.startsWith("#") && hex.length() == 7) {
+            StringBuilder builder = new StringBuilder("§x");
+
+            char[] array = hex.toCharArray();
+            for (int index = 1; index < array.length; index++) {
+                builder.append(COLOR_CHAR).append(array[index]);
+            }
+
+            return builder.toString();
+        }
+        return "";
     }
 
     public static Component gradient(String text, List<Integer> colors) {

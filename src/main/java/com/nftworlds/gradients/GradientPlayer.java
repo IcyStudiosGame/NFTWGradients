@@ -12,6 +12,10 @@ public class  GradientPlayer {
         this.handle = handle;
     }
 
+    public Player getHandle() {
+        return handle;
+    }
+
     public Gradient getGradient() {
         return gradient;
     }

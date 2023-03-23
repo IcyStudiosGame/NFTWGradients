@@ -2,6 +2,7 @@ package com.nftworlds.gradients.menu;
 
 import com.nftworlds.gradients.Gradient;
 import com.nftworlds.gradients.NFTWGradientsPlugin;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GradientMenuListener implements Listener {
 
@@ -36,7 +39,38 @@ public class GradientMenuListener implements Listener {
             event.getPlayer().openInventory(menu.getInventory());
 
             event.setCancelled(true);
+        } else if (event.getMessage().equalsIgnoreCase("/test")) {
+            Player player = event.getPlayer();
+
+            player.sendMessage(PlaceholderAPI.setPlaceholders(player, "Test wtf kek %nftw_display_name%"));
+
+            event.setCancelled(true);
         }
+    }
+
+    public static String hexConvert(String message) {
+        Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");
+        Matcher match = pattern.matcher(message);
+        while (match.find()) {
+            String color = message.substring(match.start(), match.end());
+            message = message.replace(color, color(color) + "");
+            match = pattern.matcher(message);
+        }
+        return message.replace("{", "").replace("}", "");
+    }
+
+    public static String color(String hex) {
+        if (hex.startsWith("#") && hex.length() == 7) {
+            StringBuilder magic = new StringBuilder("§x");
+
+            char[] array = hex.toCharArray();
+            for (int index = 1; index < array.length; index++) {
+                magic.append('§').append(array[index]);
+            }
+
+            return magic.toString();
+        }
+        return hex;
     }
 
     @EventHandler

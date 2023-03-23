@@ -1,11 +1,14 @@
 package com.nftworlds.gradients;
 
+import com.nftworlds.gradients.hook.GradientNameExpansion;
+import com.nftworlds.gradients.listener.PlayerListener;
 import com.nftworlds.gradients.menu.GradientMenuListener;
 import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -32,6 +35,17 @@ public class NFTWGradientsPlugin extends JavaPlugin {
 
         PluginManager pluginManager = server.getPluginManager();
         pluginManager.registerEvents(new GradientMenuListener(this), this);
+        pluginManager.registerEvents(new PlayerListener(this), this);
+
+        Plugin plugin = server.getPluginManager().getPlugin("PlaceholderAPI");
+        if (plugin != null && plugin.isEnabled()) {
+            GradientNameExpansion expansion = new GradientNameExpansion(this);
+            expansion.register();
+        }
+    }
+
+    public void addPlayer(GradientPlayer player) {
+        players.put(player.getHandle(), player);
     }
 
     public GradientPlayer getPlayer(Player handle) {
