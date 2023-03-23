@@ -4,17 +4,23 @@ import java.util.List;
 
 public class Gradient {
 
+    private final String key;
     private final String name;
     private final List<String> lore;
 
     private final String permission;
     private final List<Integer> colors;
 
-    public Gradient(String name, List<String> lore, String permission, List<Integer> colors) {
+    public Gradient(String key, String name, List<String> lore, String permission, List<Integer> colors) {
+        this.key = key;
         this.name = name;
         this.lore = lore;
         this.permission = permission;
         this.colors = colors;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public String getName() {

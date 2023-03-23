@@ -2,11 +2,13 @@ package com.nftworlds.gradients;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.nftworlds.gradients.command.GradientCommand;
 import com.nftworlds.gradients.hook.GradientNameExpansion;
 import com.nftworlds.gradients.listener.PlayerListener;
 import com.nftworlds.gradients.menu.GradientMenuListener;
 import com.nftworlds.gradients.sql.GradientMySQL;
 import org.bukkit.Server;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -49,10 +51,17 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         pluginManager.registerEvents(new GradientMenuListener(this), this);
         pluginManager.registerEvents(new PlayerListener(this), this);
 
-        Plugin plugin = server.getPluginManager().getPlugin("PlaceholderAPI");
+        Plugin plugin = pluginManager.getPlugin("PlaceholderAPI");
         if (plugin != null && plugin.isEnabled()) {
             GradientNameExpansion expansion = new GradientNameExpansion(this);
             expansion.register();
+        }
+
+        PluginCommand pluginCommand = server.getPluginCommand("gradient");
+        if (pluginCommand != null) {
+            GradientCommand command = new GradientCommand(this);
+            pluginCommand.setExecutor(command);
+            pluginCommand.setTabCompleter(command);
         }
     }
 
@@ -139,7 +148,7 @@ public class NFTWGradientsPlugin extends JavaPlugin {
                 intColors.add(Integer.parseInt(color.substring(1), 16));
             }
 
-            gradients.put(key, new Gradient(name, lore, permission, intColors));
+            gradients.put(key, new Gradient(key, name, lore, permission, intColors));
         }
     }
 

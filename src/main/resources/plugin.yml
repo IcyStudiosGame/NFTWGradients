@@ -7,3 +7,7 @@ main: com.nftworlds.gradients.NFTWGradientsPlugin
 
 softdepend:
   - PlaceholderAPI
+
+commands:
+  gradient:
+    aliases: [ gradients ]
