@@ -1,8 +1,11 @@
 package com.nftworlds.gradients;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.nftworlds.gradients.hook.GradientNameExpansion;
 import com.nftworlds.gradients.listener.PlayerListener;
 import com.nftworlds.gradients.menu.GradientMenuListener;
+import com.nftworlds.gradients.sql.GradientMySQL;
 import org.bukkit.Server;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,10 +20,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class NFTWGradientsPlugin extends JavaPlugin {
 
+    private GradientMySQL mySQL;
+
     private final Map<Player, GradientPlayer> players = new HashMap<>();
+    private final Cache<String, GradientPlayer> cachedPlayers = CacheBuilder.newBuilder()
+            .expireAfterWrite(3L, TimeUnit.MINUTES)
+            .build();
+
     private final Map<String, Gradient> gradients = new HashMap<>();
 
     @Override
@@ -30,6 +40,8 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        mySQL = new GradientMySQL();
 
         Server server = getServer();
 
@@ -44,12 +56,35 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         }
     }
 
+    public GradientMySQL getMySQL() {
+        return mySQL;
+    }
+
+    public void addCachedPlayer(GradientPlayer player) {
+        cachedPlayers.put(player.getName().toLowerCase(), player);
+    }
+
+    public GradientPlayer removeCachedPlayer(String playerName) {
+        playerName = playerName.toLowerCase();
+
+        GradientPlayer player = cachedPlayers.getIfPresent(playerName);
+        if (player != null) {
+            cachedPlayers.invalidate(playerName);
+        }
+
+        return player;
+    }
+
     public void addPlayer(GradientPlayer player) {
         players.put(player.getHandle(), player);
     }
 
     public GradientPlayer getPlayer(Player handle) {
         return players.get(handle);
+    }
+
+    public GradientPlayer removePlayer(Player handle) {
+        return players.remove(handle);
     }
 
     public Collection<Gradient> getGradients() {
