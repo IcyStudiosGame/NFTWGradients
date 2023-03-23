@@ -4,6 +4,8 @@ import com.nftworlds.gradients.Gradient;
 import com.nftworlds.gradients.GradientPlayer;
 import com.nftworlds.gradients.NFTWGradientsPlugin;
 import com.nftworlds.gradients.menu.GradientPageMenu;
+import com.nftworlds.gradients.util.Cmpt;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -74,6 +76,41 @@ public class GradientCommand implements TabExecutor {
         }
 
         @Override
+        public void onCommand(GradientPlayer player, String[] args) {
+            if (args.length != 2) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Usage: §7/gradient set <player_name> <gradient_name>");
+                return;
+            }
+
+            String targetName = args[0];
+            Player targetHandle = plugin.getServer().getPlayerExact(targetName);
+            if (targetHandle == null) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Player with nickname §7" + targetName + "§f not found");
+                return;
+            }
+
+            GradientPlayer targetPlayer = plugin.getPlayer(targetHandle);
+            if (targetPlayer == null) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Player with nickname §7" + targetName + "§f not found");
+                return;
+            }
+
+            String gradientName = args[1];
+            Gradient gradient = plugin.getGradient(gradientName);
+            if (gradient == null) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Gradient with name §7" + gradientName + "§f not found");
+                return;
+            }
+
+            targetPlayer.setGradient(gradient);
+            targetPlayer.applyGradient();
+
+            Component message = Component.text("§a§lNFTWorlds >§f You put the player " + targetHandle.getName() + " gradient ");
+            message = message.append(Cmpt.gradient(gradient.getName(), gradient.getColors()));
+            player.getHandle().sendMessage(message);
+        }
+
+        @Override
         public List<String> onTabComplete(GradientPlayer player, String[] args) {
             if (args.length == 0) {
                 List<String> complete = new ArrayList<>();
@@ -122,6 +159,33 @@ public class GradientCommand implements TabExecutor {
 
         public RemoveSubCommand() {
             super("remove", "nftgradients.admin.remove");
+        }
+
+        @Override
+        public void onCommand(GradientPlayer player, String[] args) {
+            if (args.length != 1) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Usage: §7/gradient remove <player_name>");
+                return;
+            }
+
+            String targetName = args[0];
+            Player targetHandle = plugin.getServer().getPlayerExact(targetName);
+            if (targetHandle == null) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Player with nickname §7" + targetName + "§f not found");
+                return;
+            }
+
+            GradientPlayer targetPlayer = plugin.getPlayer(targetHandle);
+            if (targetPlayer == null) {
+                player.getHandle().sendMessage("§a§lNFTWorlds >§f Player with nickname §7" + targetName + "§f not found");
+                return;
+            }
+
+            targetPlayer.setGradient(null);
+            targetPlayer.applyGradient();
+
+            Component message = Component.text("§a§lNFTWorlds >§f You removed the gradient from the player §7" + targetHandle.getName());
+            player.getHandle().sendMessage(message);
         }
 
         @Override

@@ -35,10 +35,12 @@ public class NFTWGradientsPlugin extends JavaPlugin {
     // or can be useful in asynchronous chat events.
     private final Map<Player, GradientPlayer> players = new ConcurrentHashMap<>();
     private final Cache<String, GradientPlayer> cachedPlayers = CacheBuilder.newBuilder()
-            .expireAfterWrite(3L, TimeUnit.MINUTES)
+            .expireAfterWrite(10L, TimeUnit.MINUTES)
             .build();
 
-    private final Map<String, Gradient> gradients = new HashMap<>();
+    // The use of this collection occurs when the player's data is loaded in another thread,
+    // so we make this collection ConcurrentHashMap
+    private final Map<String, Gradient> gradients = new ConcurrentHashMap<>();
 
     @Override
     public void onEnable() {
@@ -47,8 +49,6 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        mySQL = new GradientMySQL();
 
         Server server = getServer();
 
@@ -101,6 +101,10 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         return players.remove(handle);
     }
 
+    public Gradient getGradient(String name) {
+        return gradients.get(name.toLowerCase());
+    }
+
     public Collection<Gradient> getGradients() {
         return gradients.values();
     }
@@ -111,8 +115,6 @@ public class NFTWGradientsPlugin extends JavaPlugin {
 
         File file = new File(dataFolder, fileName);
         if (!file.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            file.getParentFile().mkdirs();
             if (file.createNewFile()) {
                 InputStream inputStream = getResource(fileName);
                 FileOutputStream outputStream = null;
@@ -140,12 +142,28 @@ public class NFTWGradientsPlugin extends JavaPlugin {
         }
 
         Configuration configuration = YamlConfiguration.loadConfiguration(file);
+
         // TODO: sql
+        String host = configuration.getString("MySQL.Host", "localhost");
+        int port = configuration.getInt("MySQL.Port", 3306);
+        String database = configuration.getString("MySQL.Database", "minecraft");
+        String username = configuration.getString("MySQL.Username", "root");
+        String password = configuration.getString("MySQL.Password");
+
+        File databaseFile = new File(dataFolder, database + ".db");
+        if (!databaseFile.exists() && databaseFile.createNewFile()) {
+
+        }
+
+        // String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=utf-8&cachePrepStmts=true";
+        String url = "jdbc:sqlite:" + databaseFile.getAbsolutePath();
+
+        mySQL = new GradientMySQL(this, url, username, password);
+        mySQL.createTableIfNotExists();
 
         ConfigurationSection section = configuration.getConfigurationSection("Gradients");
         if (section != null) {
             for (String key : section.getKeys(false)) {
-
                 String name = section.getString(key + ".Name");
                 List<String> lore = section.getStringList(key + ".Description");
                 String permission = "nftgradients." + key;
@@ -156,7 +174,7 @@ public class NFTWGradientsPlugin extends JavaPlugin {
                     intColors.add(IntColor.fromHex(color));
                 }
 
-                gradients.put(key, new Gradient(key, name, lore, permission, intColors));
+                gradients.put(key.toLowerCase(), new Gradient(key, name, lore, permission, intColors));
             }
         }
     }

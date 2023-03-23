@@ -40,7 +40,7 @@ public class GradientPageMenu implements GradientMenu {
     public GradientPageMenu(NFTWGradientsPlugin plugin, Player handle) {
         this.plugin = plugin;
         this.handle = handle;
-        this.inventory = Bukkit.createInventory(this, SIZE, Component.text("Test"));
+        this.inventory = Bukkit.createInventory(this, SIZE, Component.text("Gradients ▸ Page 1"));
     }
 
     @Override
@@ -71,7 +71,6 @@ public class GradientPageMenu implements GradientMenu {
             Action action = entry.getValue();
 
             inventory.setItem(slot, action.getItemStack());
-
         }
     }
 
@@ -114,7 +113,11 @@ public class GradientPageMenu implements GradientMenu {
 
         @Override
         public ItemStack getItemStack() {
-            ItemStack test = new ItemStack(Material.PAPER);
+            GradientPlayer player = plugin.getPlayer(handle);
+            boolean hasAccess = player.hasAccess(gradient);
+            boolean selected = gradient.equals(player.getGradient());
+
+            ItemStack test = new ItemStack(hasAccess ? (selected ? Material.LIME_STAINED_GLASS_PANE : Material.PAPER) : Material.RED_STAINED_GLASS_PANE);
 
             ItemMeta meta = test.getItemMeta();
 
@@ -144,8 +147,19 @@ public class GradientPageMenu implements GradientMenu {
             Component status = Component.empty();
             status = status.decoration(TextDecoration.ITALIC, false);
             status = status.append(Component.text("Status: ", TextColor.color(0xA5ACB8)));
-            status = status.append(Component.text("Available", TextColor.color(0x00c300)));
+            status = status.append(hasAccess ? Component.text("Available", TextColor.color(0x00c300)) : Component.text("Unavailable", TextColor.color(0xff2429)));
             loreTest.add(status);
+
+            loreTest.add(Component.empty());
+            if (hasAccess) {
+                if (selected) {
+                    loreTest.add(Component.text("► Click to remove gradient", TextColor.color(0xfca800)).decoration(TextDecoration.ITALIC, false));
+                } else {
+                    loreTest.add(Component.text("► Click to select gradient", TextColor.color(0xfca800)).decoration(TextDecoration.ITALIC, false));
+                }
+            } else {
+                loreTest.add(Component.text("► You do not have permission", TextColor.color(0xff2429)).decoration(TextDecoration.ITALIC, false));
+            }
 
             meta.lore(loreTest);
 
@@ -157,13 +171,31 @@ public class GradientPageMenu implements GradientMenu {
         @Override
         public void apply(Player handle) {
             GradientPlayer player = plugin.getPlayer(handle);
-            if (player != null) {
-                player.setGradient(gradient);
+            if (player == null) {
+                return;
             }
 
-            Component displayName = Cmpt.gradient(handle.getName(), gradient.getColors());
-            handle.displayName(displayName);
-            handle.playerListName(displayName);
+            if (player.hasAccess(gradient)) {
+                if (gradient.equals(player.getGradient())) {
+                    player.setGradient(null);
+
+                    Component message = Component.text("§a§lNFTWorlds >§f You removed the gradient ");
+                    message = message.append(Cmpt.gradient(gradient.getName(), gradient.getColors()));
+                    handle.sendMessage(message);
+                } else {
+                    player.setGradient(gradient);
+
+                    Component message = Component.text("§a§lNFTWorlds >§f You have chosen a gradient ");
+                    message = message.append(Cmpt.gradient(gradient.getName(), gradient.getColors()));
+                    handle.sendMessage(message);
+                }
+
+                player.applyGradient();
+            } else {
+                handle.sendMessage(Component.text("§a§lNFTWorlds >§c You do not have permission to use this gradient"));
+            }
+
+            handle.closeInventory();
         }
 
     }

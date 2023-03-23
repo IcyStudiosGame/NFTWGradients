@@ -93,7 +93,7 @@ public class PlayerListener implements Listener {
             //     the change in the permissions of the player and change
             //     the status of access to the gradient.
             if (player.hasAccess(gradient)) {
-                // TODO: apply gradient to player
+                player.applyGradient();
             } else {
                 player.setGradient(null);
             }

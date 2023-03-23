@@ -1,5 +1,7 @@
 package com.nftworlds.gradients;
 
+import com.nftworlds.gradients.util.Cmpt;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 public class GradientPlayer {
@@ -48,6 +50,16 @@ public class GradientPlayer {
         }
 
         return handle.hasPermission(permission);
+    }
+
+    public void applyGradient() {
+        Component displayName = null;
+        if (gradient != null) {
+            displayName = Cmpt.gradient(handle.getName(), gradient.getColors());
+        }
+
+        handle.displayName(displayName);
+        handle.playerListName(displayName);
     }
 
 }
